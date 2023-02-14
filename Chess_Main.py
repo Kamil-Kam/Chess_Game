@@ -1,6 +1,6 @@
 import pygame as p
 import Chess_Rules_Engine
-import BoardDrawing
+import Drawing
 import Chess_AI_Engine
 
 p.init()
@@ -8,9 +8,9 @@ p.display.set_caption("Chess v. 0.9")
 
 
 def main():
-    screen = p.display.set_mode((BoardDrawing.OUTER_FRAME_SIZE + BoardDrawing.LOG_PANEL_WIDTH, BoardDrawing.OUTER_FRAME_SIZE))
+    screen = p.display.set_mode((Drawing.OUTER_FRAME_SIZE + Drawing.LOG_PANEL_WIDTH, Drawing.OUTER_FRAME_SIZE))
     clock = p.time.Clock()
-    BoardDrawing.load_images()
+    Drawing.load_images()
 
     cre_gs = Chess_Rules_Engine.GameState()
     cre_gs.append_pre_en_passant_moves()
@@ -22,7 +22,7 @@ def main():
     square_selected = []
     player_clicks = []
 
-    black_AI = False
+    black_AI = True
     white_AI = False
 
     while running:
@@ -35,8 +35,8 @@ def main():
 
             elif event.type == p.MOUSEBUTTONDOWN:  # take position from mouse click
                 location = p.mouse.get_pos()
-                column = int((location[0] - BoardDrawing.BOARD_SPACE) // BoardDrawing.SQUARE_SIZE)
-                row = int((location[1] - BoardDrawing.BOARD_SPACE) // BoardDrawing.SQUARE_SIZE)
+                column = int((location[0] - Drawing.BOARD_SPACE) // Drawing.SQUARE_SIZE)
+                row = int((location[1] - Drawing.BOARD_SPACE) // Drawing.SQUARE_SIZE)
 
                 if column > 7:
                     break
@@ -101,19 +101,20 @@ def main():
 
         if move_made:
             if animation:
-                BoardDrawing.animate_move(screen, cre_gs.move_log[-1], cre_gs.board)
+                Drawing.animate_move(screen, cre_gs.move_log[-1], cre_gs.board)
+            Drawing.get_moves_notation()
 
             valid_moves = cre_gs.get_valid_moves()
             move_made = False
             animation = False
 
-        BoardDrawing.draw_game_state(screen, cre_gs)
-        BoardDrawing.highlight_squares(screen, cre_gs, valid_moves, player_clicks)
+        Drawing.draw_all(screen, cre_gs)
+        Drawing.highlight_squares(screen, cre_gs, valid_moves, player_clicks)
 
         if cre_gs.checkmate or cre_gs.stalemate:
-            BoardDrawing.draw_ending_statement(screen, cre_gs)
+            Drawing.draw_ending_statement(screen, cre_gs)
 
-        clock.tick(BoardDrawing.MAX_FPS)
+        clock.tick(Drawing.FPS)
         p.display.update()
 
 

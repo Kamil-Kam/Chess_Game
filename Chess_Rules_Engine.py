@@ -408,3 +408,4 @@ class Move:
 
     def get_ranks(self, row: int, column: int) -> str:
         return self.columns_to_ranks[column] + self.rows_to_ranks[row]
+

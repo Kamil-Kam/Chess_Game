@@ -21,7 +21,7 @@ LOG_PANEL_WIDTH: Final[int] = 120
 DIMENSION: Final[int] = 8
 SQUARE_SIZE = BOARD_WIDTH // DIMENSION
 
-MAX_FPS: Final[int] = 25
+FPS: Final[int] = 25
 IMAGES = {}
 
 FRAME_MARKS_FONT = p.font.SysFont('arial', 15, True, False)
@@ -37,7 +37,10 @@ LOG_PANEL_COLOR = 'black'
 LOG_PANEL_FONT_COLOR = 'white'
 ENDING_STATEMENT_FONT_SHADOW_COLOR = "antiquewhite"
 ENDING_STATEMENT_FONT_COLOR = 'black'
-
+MARKED_SQUARE_COLOR = 'green'
+POSSIBLE_MOVES_SQUARES_COLOR = 'yellow'
+ENEMY_PIECE_SQUARE_COLOR = 'red'
+LAST_MOVE_SQUARES_COLOR = 'steelblue3'
 
 """
 draw images on the board
@@ -55,7 +58,7 @@ run some functions drawing screen, frame, board and log_panel
 """
 
 
-def draw_game_state(screen, cre_gs: object()) -> None:
+def draw_all(screen, cre_gs: object()) -> None:
     draw_surround(screen)
     draw_board(screen)
     draw_pieces(screen, cre_gs.board)
@@ -130,6 +133,9 @@ draw log panel at the right side and chess notation on log panel
 
 
 def draw_moves_notation_on_log_panel(screen, cre_gs: object()) -> None:
+    global moves_notation
+    moves_notation = ''
+
     font = LOG_PANEL_FONT
     log_panel_rect = p.Rect(OUTER_FRAME_SIZE, 0, LOG_PANEL_WIDTH, LOG_PANEL_HEIGHT)
     p.draw.rect(screen, p.Color(LOG_PANEL_COLOR), log_panel_rect)
@@ -148,6 +154,7 @@ def draw_moves_notation_on_log_panel(screen, cre_gs: object()) -> None:
             Y += text_object.get_height()
             log_text += f'{turn_num}. {move_log[num]}'
             turn_num += 1
+            moves_notation += '   '
         else:
             X = text_object.get_width()
             log_text += f'   {move_log[num]}'
@@ -161,7 +168,18 @@ def draw_moves_notation_on_log_panel(screen, cre_gs: object()) -> None:
 
         text_object = font.render(str(log_text), True, p.Color(LOG_PANEL_FONT_COLOR))
         screen.blit(text_object, text_location)
-        print(log_text)
+        moves_notation += log_text
+
+
+"""
+get all moves notation
+"""
+
+
+def get_moves_notation():
+    global moves_notation
+    print(moves_notation)
+
 
 
 """
@@ -192,24 +210,27 @@ def highlight_squares(screen, cre_gs: object(), valid_moves: list, selected_squa
         if cre_gs.board[row][column][0] == ('w' if cre_gs.white_to_move else 'b'):
             square = p.Surface((SQUARE_SIZE, SQUARE_SIZE))
             square.set_alpha(50)
-            square.fill(p.Color('green'))
+            square.fill(p.Color(MARKED_SQUARE_COLOR))
             screen.blit(square, (column * SQUARE_SIZE + BOARD_SPACE, row * SQUARE_SIZE + BOARD_SPACE))
 
             for move in valid_moves:
                 if move.start_row == row and move.start_column == column:
+
                     if cre_gs.board[move.end_row][move.end_column][0] == ('b' if cre_gs.white_to_move else 'w'):
-                        square.fill(p.Color('red'))
+                        square.fill(p.Color(ENEMY_PIECE_SQUARE_COLOR))
                         screen.blit(square, (move.end_column * SQUARE_SIZE + BOARD_SPACE, move.end_row * SQUARE_SIZE + BOARD_SPACE))
                     else:
-                        square.fill(p.Color('yellow'))
+                        square.fill(p.Color(POSSIBLE_MOVES_SQUARES_COLOR))
                         screen.blit(square, (move.end_column * SQUARE_SIZE + BOARD_SPACE, move.end_row * SQUARE_SIZE + BOARD_SPACE))
 
     if len(cre_gs.move_log) > 0:
         square = p.Surface((SQUARE_SIZE, SQUARE_SIZE))
         square.set_alpha(90)
-        square.fill(p.Color('steelblue3'))
-        screen.blit(square, (cre_gs.move_log[-1].start_column * SQUARE_SIZE + BOARD_SPACE, cre_gs.move_log[-1].start_row * SQUARE_SIZE + BOARD_SPACE))
-        screen.blit(square, (cre_gs.move_log[-1].end_column * SQUARE_SIZE + BOARD_SPACE, cre_gs.move_log[-1].end_row * SQUARE_SIZE + BOARD_SPACE))
+        square.fill(p.Color(LAST_MOVE_SQUARES_COLOR))
+        screen.blit(square, (cre_gs.move_log[-1].start_column * SQUARE_SIZE + BOARD_SPACE,
+                             cre_gs.move_log[-1].start_row * SQUARE_SIZE + BOARD_SPACE))
+        screen.blit(square, (cre_gs.move_log[-1].end_column * SQUARE_SIZE + BOARD_SPACE,
+                             cre_gs.move_log[-1].end_row * SQUARE_SIZE + BOARD_SPACE))
 
     draw_pieces(screen, cre_gs.board)
 
@@ -223,8 +244,7 @@ def animate_move(screen, move: object(), board: list) -> None:
     global colors
     row_difference = move.end_row - move.start_row
     column_difference = move.end_column - move.start_column
-    frames_per_square = 20
-    frames_count = (abs(row_difference) + abs(column_difference) * frames_per_square)
+    frames_count = int(1.2 * FPS + ((abs(row_difference) + abs(column_difference)) * 2))
 
     for frame in range(frames_count + 1):
         row = (move.start_row + row_difference * frame / frames_count)
@@ -238,6 +258,5 @@ def animate_move(screen, move: object(), board: list) -> None:
         if move.piece_captured != '--':
             screen.blit(IMAGES[move.piece_captured], end_square)
 
-        screen.blit(IMAGES[move.piece_moved],
-                    p.Rect(column * SQUARE_SIZE + BOARD_SPACE, row * SQUARE_SIZE + BOARD_SPACE, SQUARE_SIZE, SQUARE_SIZE))
+        screen.blit(IMAGES[move.piece_moved], p.Rect(column * SQUARE_SIZE + BOARD_SPACE, row * SQUARE_SIZE + BOARD_SPACE, SQUARE_SIZE, SQUARE_SIZE))
         p.display.update()
