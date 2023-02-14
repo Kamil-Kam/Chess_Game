@@ -1,5 +1,4 @@
 """
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 Functions to drawing board and pieces, and to drawing text,
 parameters describing board and text,
 functions animating moves
