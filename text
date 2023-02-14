@@ -1,0 +1,68 @@
+Main
+wywołujemy ChessEngine.GameState()get_valid_move()
+    -> get_all_possible_moves
+    -> dodaje wszystkie mozliwe ruchy -> nastepnie usuwa te lamiace zasady
+
+move made = True
+running = True
+square selected = []
+player clicks = []
+
+
+
+while running:
+pobiera lokalizację kliknięcia
+jezeli 2 klikniecia na to samo pole -> pomija drugie klikniecie
+jezele pierwsze klikniecie na zly kolor -> pomija
+jezeli kliknie dwa razy na ten sam kolor figur -> usuwa pierwszy klik
+jezeli pierwsze klikniecie nic nie wybiera -> pomija
+
+przypisanie:
+square selected
+player clicks
+
+jeżeli to drugie (właściwe) klikniecie:
+                    piece_move = ChessEngine.Move(player_clicks[0], player_clicks[1], chess_engine_game_state.board)
+                    -> tworzy obiekt klasy Move
+
+
+    jezeli move in ChessEngine.valid_moves:
+                        chess_engine_game_state.make_move(piece_move)
+                        move_made = True
+                    square_selected = []
+                    player_clicks = []
+
+jesli nacisniemy 'Backspace':
+                chess_engine_game_state.undo_move()
+                move_made = True
+
+jezeli move_made:
+            valid_moves = chess_engine_game_state.get_valid_move()
+            move_made = False
+
+
+BoardDrawing.draw_game_state(screen, chess_engine_game_state)
+clock.tick(BoardDrawing.MAX_FPS)
+p.display.update()
+
+
+Chess Engine:
+tworzy wszystkie dozwolone ruchy -> valid_moves:
+    get_all_possible_moves -> tworzy listę wszystkich możliwych ruchów
+najpierw sprawdza czy move jest w valid_moves
+potem wykonuje ruch chess_engine_game_state.make_move(ChessEngine.Move(player_clicks[0], player_clicks[1], chess_engine_game_state.board))
+
+
+
+
+
+kiedy pierwszy raz dostajemy valid moves w main???
+gdzie są porownania Move.__eq__ ???
+
+
+
+le_passant liczy tylko jeden do przodu
+
+
+castlings:
+    get_valid_moves -> append_castling_moves ->
