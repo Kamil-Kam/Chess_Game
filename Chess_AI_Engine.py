@@ -3,7 +3,7 @@ import random
 piece_score = {"K": 500, "Q": 9, "R": 5, "B": 3, "N": 3, "p": 1}
 checkmate = 1000
 stalemate = 0
-DEPTH = 2
+DEPTH = 3
 
 
 def get_best_move(cre_gs: object(), valid_moves: list) -> object():
@@ -38,10 +38,11 @@ def get_best_move(cre_gs: object(), valid_moves: list) -> object():
     return AI_best_move
 
 
-def find_best_move(cre_gs: object(), valid_moves: list) -> object():
+def find_best_move(cre_gs: object(), valid_moves: list, queue) -> object():
     random.shuffle(valid_moves)
     global next_move
     find_nega_max_move_alpha_beta(cre_gs, DEPTH, valid_moves, 1 if cre_gs.white_to_move else -1, -checkmate, checkmate)
+    queue.put(next_move)
     return next_move
 
 

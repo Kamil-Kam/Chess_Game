@@ -2,6 +2,8 @@ import pygame as p
 import Chess_Rules_Engine
 import Drawing
 import Chess_AI_Engine
+import threading
+from multiprocessing import Queue
 
 p.init()
 p.display.set_caption("Chess v. 0.9")
@@ -24,6 +26,7 @@ def main():
 
     black_AI = True
     white_AI = False
+    AI_thinking = False
 
     while running:
         AI_turn = (cre_gs.white_to_move and white_AI) or (
@@ -94,10 +97,19 @@ def main():
                     move_made = False
 
         if AI_turn and not cre_gs.checkmate and not cre_gs.stalemate:
-            AI_move = Chess_AI_Engine.find_best_move(cre_gs, valid_moves)
-            cre_gs.make_move(AI_move)
-            move_made = True
-            animation = True
+            return_queue = Queue()
+            AI_thinking_threat = threading.Thread(target=Chess_AI_Engine.find_best_move, args=(cre_gs, valid_moves, return_queue))
+            AI_thinking_threat.start()
+            # thread_1.join()
+            # AI_move = Chess_AI_Engine.find_best_move(cre_gs, valid_moves)
+            AI_thinking_threat.join()
+            if not AI_thinking_threat.is_alive():
+                AI_move = return_queue.get()
+
+                cre_gs.make_move(AI_move)
+                move_made = True
+                animation = True
+
 
         if move_made:
             if animation:
@@ -116,6 +128,7 @@ def main():
 
         clock.tick(Drawing.FPS)
         p.display.update()
+        # print(threading.active_count())
 
 
 if __name__ == "__main__":
