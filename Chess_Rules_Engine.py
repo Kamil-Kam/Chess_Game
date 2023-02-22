@@ -47,23 +47,22 @@ class GameState:
         self.white_queen_castling_currently = True
         self.white_king_castling_currently = True
 
-    def are_castlings_possible(self, move: object(),
-                               num: int) -> None:  # add or subtract castlings possibility after
-        # each make_move and undo_move
-        if move.start_square == [0, 0] or move.end_square == [0, 0]:
+    def are_castlings_possible(self, move: object(), num: int) -> None:
+        # add or subtract castlings possibility after each make_move and undo_move
+        if move.start_square == (0, 0) or move.end_square == (0, 0):
             self.black_queen_castling_mark += num
-        if move.start_square == [0, 4] or move.end_square == [0, 4]:
+        if move.start_square == (0, 4) or move.end_square == (0, 4):
             self.black_queen_castling_mark += num
             self.black_king_castling_mark += num
-        if move.start_square == [0, 7] or move.end_square == [0, 7]:
+        if move.start_square == (0, 7) or move.end_square == (0, 7):
             self.black_king_castling_mark += num
 
-        if move.start_square == [7, 0] or move.end_square == [7, 0]:
+        if move.start_square == (7, 0) or move.end_square == (7, 0):
             self.white_queen_castling_mark += num
-        if move.start_square == [7, 4] or move.end_square == [7, 4]:
+        if move.start_square == (7, 4) or move.end_square == (7, 4):
             self.white_queen_castling_mark += num
             self.white_king_castling_mark += num
-        if move.start_square == [7, 7] or move.end_square == [7, 7]:
+        if move.start_square == (7, 7) or move.end_square == (7, 7):
             self.white_king_castling_mark += num
 
     def after_move_on_board(self, move: object()) -> None:  # executed when move on board is made, pawn promotion
@@ -73,6 +72,7 @@ class GameState:
         if move.piece_moved == f'{color}p' and move.end_row == promotion_row:  # run pawn promotion
             piece = self.get_pawn_promotion()
             self.board[promotion_row][move.end_column] = color + piece
+
 
     def castling_under_attack(self):  # if between king and rook are figures or those squares are under attack,
         # or king is under attack -> disable castling
@@ -139,16 +139,15 @@ class GameState:
 
     @staticmethod
     def get_pawn_promotion() -> str:  # allow player to insert figure name when pawn is promoted
-        while not re.match(r'^Q|R|B|N$',
-                           piece := input('Insert "Q" - Queen, or "R" - Rook, or "B" - Bishop, or "N" - Knight: \n')):
+        while not re.match(r'^Q|R|B|N$', piece := input('Insert "Q" - Queen, or "R" - Rook, or "B" - Bishop, or "N" - Knight: \n')):
             pass
         return piece
 
     def append_pre_en_passant_moves(self) -> None:  # creates all possibly pre-en passant moves, run only one time
         row_black, row_white = 1, 6
         for column in range(0, 8):
-            self.pre_en_passant_possible_moves.append(Move([row_black, column], [row_black + 2, column], self.board))
-            self.pre_en_passant_possible_moves.append(Move([row_white, column], [row_white - 2, column], self.board))
+            self.pre_en_passant_possible_moves.append(Move((row_black, column), (row_black + 2, column), self.board))
+            self.pre_en_passant_possible_moves.append(Move((row_white, column), (row_white - 2, column), self.board))
 
     def is_pre_en_passant(self) -> None:  # if the last move is pre en passant -> allow en_passant moves
         if len(self.move_log) > 0:
@@ -202,7 +201,6 @@ class GameState:
                     elif move.end_column == 6:
                         self.board[move.end_row][5] = '--'
                         self.board[move.end_row][7] = f'{move.piece_moved[0]}R'
-            self.are_castlings_possible(move, -1)
 
             if len(self.move_log) > 0:
                 premove = self.move_log[-1]
@@ -214,6 +212,7 @@ class GameState:
                 color = 'b' if self.white_to_move else 'w'
                 self.board[move.start_row][move.start_column + direction] = f'{color}p'
 
+            self.are_castlings_possible(move, -1)
             self.checkmate = False
             self.stalemate = False
 
@@ -269,8 +268,7 @@ class GameState:
                 return True
         return False
 
-    def get_pawn_en_passant_moves(self,
-                                  moves: list) -> None:  # add en_passant moves to moves list and en_passant_moves list
+    def get_pawn_en_passant_moves(self, moves: list) -> None:  # add en_passant moves to moves list and en_passant_moves list
         moving_piece = 'wp' if self.white_to_move else 'bp'
         row_move_direction = -1 if self.white_to_move else 1
         row = self.pre_en_passant_move_end_position[0]

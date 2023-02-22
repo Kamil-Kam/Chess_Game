@@ -25,7 +25,7 @@ FPS: Final[int] = 25
 IMAGES = {}
 
 FRAME_MARKS_FONT = p.font.SysFont('arial', 15, True, False)
-END_STATEMENT_FONT = p.font.SysFont('arial', 35, True, False)
+CENTRAL_BOARD_STATEMENT_FONT = p.font.SysFont('arial', 35, True, False)
 LOG_PANEL_FONT = p.font.SysFont('arial', 12, False, False)
 
 BRIGHT_SQUARES_COLOR = "antiquewhite"
@@ -62,7 +62,7 @@ def draw_all(screen, cre_gs: object()) -> None:
     draw_surround(screen)
     draw_board(screen)
     draw_pieces(screen, cre_gs.board)
-    draw_moves_notation_on_log_panel(screen, cre_gs)
+    # draw_moves_notation_on_log_panel(screen, cre_gs)
 
 
 """
@@ -132,43 +132,98 @@ draw log panel at the right side and chess notation on log panel
 """
 
 
-def draw_moves_notation_on_log_panel(screen, cre_gs: object()) -> None:
+# def draw_moves_notation_on_log_panel(screen, cre_gs: object()) -> None:
+#     global moves_notation
+#     moves_notation = ''
+#
+#     font = LOG_PANEL_FONT
+#     log_panel_rect = p.Rect(OUTER_FRAME_SIZE, 0, LOG_PANEL_WIDTH, LOG_PANEL_HEIGHT)
+#     p.draw.rect(screen, p.Color(LOG_PANEL_COLOR), log_panel_rect)
+#     move_log = cre_gs.move_log
+#     Y = 0
+#     turn_num = 1
+#
+#     for num in range(len(move_log)):
+#         log_text = ''
+#         X = 0
+#
+#         if num == 0:
+#             log_text += f'{turn_num}. {move_log[num]}'
+#             turn_num += 1
+#         elif num > 0 and num % 2 == 0:
+#             Y += text_object.get_height()
+#             log_text += f'{turn_num}. {move_log[num]}'
+#             turn_num += 1
+#             moves_notation += '   '
+#         else:
+#             X = text_object.get_width()
+#             log_text += f'   {move_log[num]}'
+#
+#         if num == 0:
+#             text_location = log_panel_rect.move(0, 0)
+#         elif num > 0 and num % 2 == 0:
+#             text_location = log_panel_rect.move(0, Y)
+#         else:
+#             text_location = log_panel_rect.move(X, Y)
+#
+#         text_object = font.render(str(log_text), True, p.Color(LOG_PANEL_FONT_COLOR))
+#         screen.blit(text_object, text_location)
+#         moves_notation += log_text
+
+def draw_moves_notation_and_log_panel(screen, cre_gs: object()) -> None:
     global moves_notation
     moves_notation = ''
 
     font = LOG_PANEL_FONT
-    log_panel_rect = p.Rect(OUTER_FRAME_SIZE, 0, LOG_PANEL_WIDTH, LOG_PANEL_HEIGHT)
-    p.draw.rect(screen, p.Color(LOG_PANEL_COLOR), log_panel_rect)
     move_log = cre_gs.move_log
     Y = 0
     turn_num = 1
 
-    for num in range(len(move_log)):
+    lines_number = (len(move_log) // 2) + 1
+    line_height = font.get_height()
+    text_size_rectangle = (LOG_PANEL_WIDTH, lines_number * line_height)
+    text_surface = p.Surface(text_size_rectangle, p.SRCALPHA)
+
+    for move_num in range(len(move_log)):
         log_text = ''
         X = 0
 
-        if num == 0:
-            log_text += f'{turn_num}. {move_log[num]}'
+        if move_num == 0:
+            log_text += f'{turn_num}. {move_log[move_num]}'
             turn_num += 1
-        elif num > 0 and num % 2 == 0:
+        elif move_num > 0 and move_num % 2 == 0:
             Y += text_object.get_height()
-            log_text += f'{turn_num}. {move_log[num]}'
+            log_text += f'{turn_num}. {move_log[move_num]}'
             turn_num += 1
             moves_notation += '   '
         else:
             X = text_object.get_width()
-            log_text += f'   {move_log[num]}'
+            log_text += f'   {move_log[move_num]}'
 
-        if num == 0:
-            text_location = log_panel_rect.move(0, 0)
-        elif num > 0 and num % 2 == 0:
-            text_location = log_panel_rect.move(0, Y)
+        if move_num == 0:
+            text_location = (0, 0)
+        elif move_num > 0 and move_num % 2 == 0:
+            text_location = (0, Y)
         else:
-            text_location = log_panel_rect.move(X, Y)
+            text_location = (X, Y)
 
         text_object = font.render(str(log_text), True, p.Color(LOG_PANEL_FONT_COLOR))
-        screen.blit(text_object, text_location)
+        text_surface.blit(text_object, text_location)
         moves_notation += log_text
+
+    log_panel_rect = p.Rect(OUTER_FRAME_SIZE, 0, LOG_PANEL_WIDTH, LOG_PANEL_HEIGHT)
+    p.draw.rect(screen, p.Color(LOG_PANEL_COLOR), log_panel_rect)
+    height_difference = text_surface.get_height() - LOG_PANEL_HEIGHT
+    scroll = 1.0
+
+    if height_difference > 0:
+        text_off_screen_Y = int(height_difference * scroll)
+        subsurface_rect = p.Rect(0, text_off_screen_Y, LOG_PANEL_WIDTH, LOG_PANEL_HEIGHT)
+        subsurface_text_surface = text_surface.subsurface(subsurface_rect)
+        screen.blit(subsurface_text_surface, log_panel_rect)
+
+    else:
+        screen.blit(text_surface, log_panel_rect)
 
 
 """
@@ -181,14 +236,13 @@ def get_moves_notation():
     print(moves_notation)
 
 
-
 """
 draw a statement if game is over
 """
 
 
 def draw_ending_statement(screen, cre_gs: object()) -> None:
-    font = END_STATEMENT_FONT
+    font = CENTRAL_BOARD_STATEMENT_FONT
 
     text = ("GAME OVER BLACK WINS" if cre_gs.white_to_move else "GAME OVER WHITE WINS") if cre_gs.checkmate else "STALEMATE"
     text_object = font.render(text, False, p.Color(ENDING_STATEMENT_FONT_SHADOW_COLOR))
@@ -196,6 +250,21 @@ def draw_ending_statement(screen, cre_gs: object()) -> None:
     screen.blit(text_object, text_location)
     text_object = font.render(text, False, p.Color(ENDING_STATEMENT_FONT_COLOR))
     screen.blit(text_object, text_location.move(2, 2))
+
+
+def draw_pause(screen) -> None:
+    font = CENTRAL_BOARD_STATEMENT_FONT
+
+    text_list = ['PAUSE', 'press "c" to continue']
+    text_height = font.get_height() // 2
+
+    for text in text_list:
+        text_object = font.render(text, False, p.Color(ENDING_STATEMENT_FONT_SHADOW_COLOR))
+        text_location = p.Rect(0, 0, OUTER_FRAME_SIZE, OUTER_FRAME_SIZE).move(OUTER_FRAME_SIZE / 2 - text_object.get_width() / 2, OUTER_FRAME_SIZE / 2 - text_object.get_height() / 2 - text_height)
+        screen.blit(text_object, text_location)
+        text_object = font.render(text, False, p.Color(ENDING_STATEMENT_FONT_COLOR))
+        screen.blit(text_object, text_location.move(2, 2))
+        text_height = -text_height
 
 
 """
