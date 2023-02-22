@@ -127,7 +127,7 @@ def main():
             if not AI_thinking:
                 start_time = time.time()
                 return_queue = Queue()
-                AI_thinking_process = Process(target=Chess_AI_Engine_multiprocessing_process.find_best_move, args=(cre_gs, valid_moves, return_queue))
+                AI_thinking_process = Process(target=Chess_AI_Engine.find_best_move, args=(cre_gs, valid_moves, return_queue))
                 AI_thinking_process.start()
                 AI_thinking = True
 
