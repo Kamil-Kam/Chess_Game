@@ -1,17 +1,20 @@
 import pygame as p
 import Chess_Rules_Engine
 import Drawing
-import Chess_AI_Engine, Chess_AI_Engine_multiprocessing_process, Chess_AI_Engine_multiprocessing_pool
+import Chess_AI_Engine, Chess_AI_Engine_multiprocessing_process, Chess_AI_Engine_multiprocessing_pool, Chess_AI_Engine_GPT
 from multiprocessing import Queue, Process
 import time
 
 p.init()
-p.display.set_caption("Chess v. 0.9")
+p.display.set_caption("Chess Project v. 1.0")
 
 
 def main():
     screen = p.display.set_mode((Drawing.OUTER_FRAME_SIZE + Drawing.LOG_PANEL_WIDTH, Drawing.OUTER_FRAME_SIZE))
     clock = p.time.Clock()
+    Drawing.draw_starting_screen(screen)
+    p.display.update()
+    time.sleep(3)
     Drawing.load_images()
 
     cre_gs = Chess_Rules_Engine.GameState()
@@ -27,8 +30,7 @@ def main():
     black_AI = True
     white_AI = True
     AI_thinking = False
-    AI_process = None
-    Drawing.draw_all(screen, cre_gs)
+    Drawing.draw_all(screen, cre_gs, valid_moves, player_clicks)
     
     while running:
         AI_turn = (cre_gs.white_to_move and white_AI) or (not cre_gs.white_to_move and black_AI)
@@ -37,7 +39,7 @@ def main():
             if event.type == p.QUIT:
                 running = False
 
-            elif event.type == p.MOUSEBUTTONDOWN:  # take position from mouse click
+            elif event.type == p.MOUSEBUTTONDOWN and not AI_thinking:  # take position from mouse click
                 location = p.mouse.get_pos()
                 column = int((location[0] - Drawing.BOARD_SPACE) // Drawing.SQUARE_SIZE)
                 row = int((location[1] - Drawing.BOARD_SPACE) // Drawing.SQUARE_SIZE)
@@ -46,8 +48,8 @@ def main():
                     break
 
                 if square_selected == (row, column):  # if 2 x click on the same square -> remove second click
-                    # square_selected = (row, column)
-                    player_clicks.pop()
+                    if len(player_clicks) > 0:
+                        player_clicks.pop()
                     pass
 
                 if ((cre_gs.board[row][column][0] == 'b' and cre_gs.white_to_move) or (cre_gs.board[row][column][0] == 'w'
@@ -73,25 +75,35 @@ def main():
 
                     if move in valid_moves:
                         cre_gs.make_move(move)
-                        # cre_gs.after_move_on_board(move)
                         move_made = True
                         animation = True
 
-                    square_selected = []  # after move_made clear square selected
+                    square_selected = ()  # after move_made clear square selected
                     player_clicks = []  # after move_made clear player clicks
 
             elif event.type == p.KEYDOWN:
 
                 if event.key == p.K_BACKSPACE:  # cancel move
+                    if AI_thinking:
+                        AI_thinking_process.terminate()
+                        AI_thinking_process.join()
+                        AI_thinking = False
+                        AI_turn = False
                     cre_gs.undo_move()
                     move_made = True
 
+
                 if event.key == p.K_r:  # board reset
+                    if AI_thinking:
+                        AI_thinking_process.terminate()
+                        AI_thinking_process.join()
+                        AI_thinking = False
+                        AI_turn = False
                     cre_gs = Chess_Rules_Engine.GameState()
                     valid_moves = cre_gs.get_valid_moves()
                     square_selected = []
                     player_clicks = []
-                    move_made = False
+                    move_made = True
 
                 if event.key == p.K_p:  # game pause
                     stop = True
@@ -114,13 +126,16 @@ def main():
                                     move_made = True
                                     AI_turn = False
 
-                                if pause_event.key == p.K_BACKSPACE:  # cancel move
+                                if pause_event.key == p.K_BACKSPACE:
+                                    if AI_thinking:
+                                        AI_thinking_process.terminate()
+                                        AI_thinking_process.join()
+                                        AI_thinking = False
+                                        AI_turn = False
                                     cre_gs.undo_move()
                                     move_made = True
-                                    Drawing.draw_moves_notation_and_log_panel(screen, cre_gs)
-                                    Drawing.get_moves_notation()
-                                    Drawing.draw_all(screen, cre_gs)
-                                    Drawing.highlight_squares(screen, cre_gs, valid_moves, player_clicks)
+                                    Drawing.draw_all(screen, cre_gs, valid_moves, player_clicks)
+                                    Drawing.draw_pause(screen)
                                     p.display.update()
 
         if AI_turn and not cre_gs.checkmate and not cre_gs.stalemate:
@@ -137,23 +152,19 @@ def main():
                 move_made = True
                 animation = True
                 AI_thinking = False
-                print(time.time() - start_time)
+                print(f'{round((time.time() - start_time), 2)} sec - AI thinking time')
+
+        Drawing.draw_all(screen, cre_gs, valid_moves, player_clicks)
 
         if move_made:
 
             if animation:
                 Drawing.animate_move(screen, cre_gs.move_log[-1], cre_gs.board)
-            if len(cre_gs.move_log) > 0:
-                cre_gs.after_move_on_board(cre_gs.move_log[-1])
-                Drawing.draw_moves_notation_and_log_panel(screen, cre_gs)
-                Drawing.get_moves_notation()
 
+            Drawing.get_moves_notation()
             valid_moves = cre_gs.get_valid_moves()
             move_made = False
             animation = False
-
-        Drawing.draw_all(screen, cre_gs)
-        Drawing.highlight_squares(screen, cre_gs, valid_moves, player_clicks)
 
         if cre_gs.checkmate or cre_gs.stalemate:
             Drawing.draw_ending_statement(screen, cre_gs)

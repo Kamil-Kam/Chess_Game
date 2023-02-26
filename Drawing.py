@@ -1,6 +1,6 @@
 """
-Functions to drawing board and pieces, and to drawing text,
-parameters describing board and text,
+Parameters describing board and text,
+functions to drawing board, pieces and text,
 functions animating moves
 """
 
@@ -16,7 +16,7 @@ OUTER_FRAME_SIZE: Final[int] = 740
 FRAME_SPACE = ((OUTER_FRAME_SIZE - INNER_FRAME_SIZE) / 2)
 BOARD_SPACE = ((OUTER_FRAME_SIZE - BOARD_WIDTH) / 2)
 LOG_PANEL_HEIGHT: Final[int] = BOARD_HEIGHT
-LOG_PANEL_WIDTH: Final[int] = 120
+LOG_PANEL_WIDTH: Final[int] = 160
 
 DIMENSION: Final[int] = 8
 SQUARE_SIZE = BOARD_WIDTH // DIMENSION
@@ -25,8 +25,8 @@ FPS: Final[int] = 25
 IMAGES = {}
 
 FRAME_MARKS_FONT = p.font.SysFont('arial', 15, True, False)
-CENTRAL_BOARD_STATEMENT_FONT = p.font.SysFont('arial', 35, True, False)
-LOG_PANEL_FONT = p.font.SysFont('arial', 12, False, False)
+CENTRAL_BOARD_STATEMENT_FONT = p.font.SysFont('arial', 40, True, False)
+LOG_PANEL_FONT = p.font.SysFont('arial', 15, False, False)
 
 BRIGHT_SQUARES_COLOR = "antiquewhite"
 DARK_SQUARES_COLOR = "burlywood3"
@@ -42,35 +42,26 @@ POSSIBLE_MOVES_SQUARES_COLOR = 'yellow'
 ENEMY_PIECE_SQUARE_COLOR = 'red'
 LAST_MOVE_SQUARES_COLOR = 'steelblue3'
 
-"""
-draw images on the board
-"""
+def draw_starting_screen(screen) -> None:
+    starting_screen = p.transform.smoothscale(p.image.load("images/chess_image.jpg"), (OUTER_FRAME_SIZE + LOG_PANEL_WIDTH, OUTER_FRAME_SIZE))
+    screen.blit(starting_screen, (0, 0))
 
 
-def load_images() -> None:
+def load_images() -> None:  # load images to the IMAGES dictionary
     pieces = ['bR', 'bN', 'bB', 'bQ', 'bK', 'bp', 'wR', 'wN', 'wB', 'wQ', 'wK', 'wp']
     for piece in pieces:
         IMAGES[piece] = p.transform.scale(p.image.load(f"images/{piece}.png"), (SQUARE_SIZE, SQUARE_SIZE))
 
 
-"""
-run some functions drawing screen, frame, board and log_panel
-"""
-
-
-def draw_all(screen, cre_gs: object()) -> None:
+def draw_all(screen, cre_gs: object(), valid_moves, player_clicks) -> None:  # run some functions drawing surround, board and pieces
+    draw_moves_notation_and_log_panel(screen, cre_gs)
     draw_surround(screen)
     draw_board(screen)
     draw_pieces(screen, cre_gs.board)
-    # draw_moves_notation_on_log_panel(screen, cre_gs)
+    highlight_squares(screen, cre_gs, valid_moves, player_clicks)
 
 
-"""
-draw color on each square
-"""
-
-
-def draw_board(screen) -> None:
+def draw_board(screen) -> None:  # draw color on each square
     global colors
     colors = [p.Color(BRIGHT_SQUARES_COLOR), p.Color(DARK_SQUARES_COLOR)]
     for row in range(DIMENSION):
@@ -79,12 +70,7 @@ def draw_board(screen) -> None:
             p.draw.rect(screen, color, p.Rect(column * SQUARE_SIZE + BOARD_SPACE, row * SQUARE_SIZE + BOARD_SPACE, SQUARE_SIZE, SQUARE_SIZE))
 
 
-"""
-draw surrounds and marks around chess board
-"""
-
-
-def draw_surround(screen) -> None:
+def draw_surround(screen) -> None:  # draw surrounds and marks around chess board
     font = FRAME_MARKS_FONT
     p.draw.rect(screen, OUTER_FRAME_COLOR, p.Rect(0, 0, OUTER_FRAME_SIZE, OUTER_FRAME_SIZE))
     p.draw.rect(screen, INNER_FRAME_COLOR, p.Rect(FRAME_SPACE, FRAME_SPACE, INNER_FRAME_SIZE, INNER_FRAME_SIZE))
@@ -112,65 +98,16 @@ def draw_surround(screen) -> None:
         Y += SQUARE_SIZE
 
 
-"""
-draw pieces on the board
-"""
-
-
-def draw_pieces(screen, board: list) -> None:
+def draw_pieces(screen, board: list) -> None:  # draw pieces on the board
     for row in range(DIMENSION):
         for column in range(DIMENSION):
             piece = board[row][column]
 
             if piece != "--":
-                screen.blit(IMAGES[piece],
-                            p.Rect(column * SQUARE_SIZE + BOARD_SPACE, row * SQUARE_SIZE + BOARD_SPACE, SQUARE_SIZE, SQUARE_SIZE))
+                screen.blit(IMAGES[piece], p.Rect(column * SQUARE_SIZE + BOARD_SPACE, row * SQUARE_SIZE + BOARD_SPACE, SQUARE_SIZE, SQUARE_SIZE))
 
 
-"""
-draw log panel at the right side and chess notation on log panel
-"""
-
-
-# def draw_moves_notation_on_log_panel(screen, cre_gs: object()) -> None:
-#     global moves_notation
-#     moves_notation = ''
-#
-#     font = LOG_PANEL_FONT
-#     log_panel_rect = p.Rect(OUTER_FRAME_SIZE, 0, LOG_PANEL_WIDTH, LOG_PANEL_HEIGHT)
-#     p.draw.rect(screen, p.Color(LOG_PANEL_COLOR), log_panel_rect)
-#     move_log = cre_gs.move_log
-#     Y = 0
-#     turn_num = 1
-#
-#     for num in range(len(move_log)):
-#         log_text = ''
-#         X = 0
-#
-#         if num == 0:
-#             log_text += f'{turn_num}. {move_log[num]}'
-#             turn_num += 1
-#         elif num > 0 and num % 2 == 0:
-#             Y += text_object.get_height()
-#             log_text += f'{turn_num}. {move_log[num]}'
-#             turn_num += 1
-#             moves_notation += '   '
-#         else:
-#             X = text_object.get_width()
-#             log_text += f'   {move_log[num]}'
-#
-#         if num == 0:
-#             text_location = log_panel_rect.move(0, 0)
-#         elif num > 0 and num % 2 == 0:
-#             text_location = log_panel_rect.move(0, Y)
-#         else:
-#             text_location = log_panel_rect.move(X, Y)
-#
-#         text_object = font.render(str(log_text), True, p.Color(LOG_PANEL_FONT_COLOR))
-#         screen.blit(text_object, text_location)
-#         moves_notation += log_text
-
-def draw_moves_notation_and_log_panel(screen, cre_gs: object()) -> None:
+def draw_moves_notation_and_log_panel(screen, cre_gs: object()) -> None:  # draw log panel ont the right side and chess notation on the log panel
     global moves_notation
     moves_notation = ''
 
@@ -226,33 +163,24 @@ def draw_moves_notation_and_log_panel(screen, cre_gs: object()) -> None:
         screen.blit(text_surface, log_panel_rect)
 
 
-"""
-get all moves notation
-"""
-
-
-def get_moves_notation():
+def get_moves_notation() -> None:  # print all moves notation
     global moves_notation
     print(moves_notation)
 
 
-"""
-draw a statement if game is over
-"""
-
-
-def draw_ending_statement(screen, cre_gs: object()) -> None:
+def draw_ending_statement(screen, cre_gs: object()) -> None:  # draw a statement if game is over
     font = CENTRAL_BOARD_STATEMENT_FONT
 
     text = ("GAME OVER BLACK WINS" if cre_gs.white_to_move else "GAME OVER WHITE WINS") if cre_gs.checkmate else "STALEMATE"
     text_object = font.render(text, False, p.Color(ENDING_STATEMENT_FONT_SHADOW_COLOR))
-    text_location = p.Rect(0, 0, OUTER_FRAME_SIZE, OUTER_FRAME_SIZE).move(OUTER_FRAME_SIZE / 2 - text_object.get_width() / 2, OUTER_FRAME_SIZE / 2 - text_object.get_height() / 2)
+    text_location = p.Rect(0, 0, OUTER_FRAME_SIZE, OUTER_FRAME_SIZE).move(OUTER_FRAME_SIZE / 2 - text_object.get_width() / 2,
+                                                                          OUTER_FRAME_SIZE / 2 - text_object.get_height() / 2)
     screen.blit(text_object, text_location)
     text_object = font.render(text, False, p.Color(ENDING_STATEMENT_FONT_COLOR))
     screen.blit(text_object, text_location.move(2, 2))
 
 
-def draw_pause(screen) -> None:
+def draw_pause(screen) -> None:   # draw a pause statement if game is stopped
     font = CENTRAL_BOARD_STATEMENT_FONT
 
     text_list = ['PAUSE', 'press "c" to continue']
@@ -260,19 +188,15 @@ def draw_pause(screen) -> None:
 
     for text in text_list:
         text_object = font.render(text, False, p.Color(ENDING_STATEMENT_FONT_SHADOW_COLOR))
-        text_location = p.Rect(0, 0, OUTER_FRAME_SIZE, OUTER_FRAME_SIZE).move(OUTER_FRAME_SIZE / 2 - text_object.get_width() / 2, OUTER_FRAME_SIZE / 2 - text_object.get_height() / 2 - text_height)
+        text_location = p.Rect(0, 0, OUTER_FRAME_SIZE, OUTER_FRAME_SIZE).move(OUTER_FRAME_SIZE / 2 - text_object.get_width() / 2,
+                                                                              OUTER_FRAME_SIZE / 2 - text_object.get_height() / 2 - text_height)
         screen.blit(text_object, text_location)
         text_object = font.render(text, False, p.Color(ENDING_STATEMENT_FONT_COLOR))
         screen.blit(text_object, text_location.move(2, 2))
         text_height = -text_height
 
 
-"""
-highlight possible moves squares
-"""
-
-
-def highlight_squares(screen, cre_gs: object(), valid_moves: list, selected_square: list) -> None:
+def highlight_squares(screen, cre_gs: object(), valid_moves: list, selected_square: list) -> None:  # highlight possible moves squares
     if len(selected_square) == 1:
         row, column = selected_square[0]
 
@@ -304,12 +228,7 @@ def highlight_squares(screen, cre_gs: object(), valid_moves: list, selected_squa
     draw_pieces(screen, cre_gs.board)
 
 
-"""
-animating moves
-"""
-
-
-def animate_move(screen, move: object(), board: list) -> None:
+def animate_move(screen, move: object(), board: list) -> None:  # animate moves
     global colors
     row_difference = move.end_row - move.start_row
     column_difference = move.end_column - move.start_column
