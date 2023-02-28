@@ -1,4 +1,4 @@
-
+print(f'{round((time.time() - start_time), 2)} sec - AI thinking time')
 
 def after_move_on_board(self, move: object()) -> None:  # executed when move on board is made, enable pawn promotion
     color = 'b' if self.white_to_move else 'w'

@@ -26,7 +26,7 @@ IMAGES = {}
 
 FRAME_MARKS_FONT = p.font.SysFont('arial', 15, True, False)
 CENTRAL_BOARD_STATEMENT_FONT = p.font.SysFont('arial', 40, True, False)
-LOG_PANEL_FONT = p.font.SysFont('arial', 15, False, False)
+LOG_PANEL_FONT = p.font.SysFont('arial', 14, False, False)
 
 BRIGHT_SQUARES_COLOR = "antiquewhite"
 DARK_SQUARES_COLOR = "burlywood3"

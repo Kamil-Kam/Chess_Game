@@ -61,7 +61,7 @@ king_scores = [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-               [0.0, 0.3, 0.3, 0.0, 0.1, 0.0, 0.3, 0.0]]
+               [0.0, 0.4, 0.4, 0.0, 0.1, 0.0, 0.4, 0.0]]
 
 piece_position_scores = {"wN": knight_scores, "bN": knight_scores[::-1], "wB": bishop_scores, "bB": bishop_scores[::-1], "wQ": queen_scores,
                          "bQ": queen_scores[::-1], "wR": rook_scores, "bR": rook_scores[::-1], "wp": pawn_scores, "bp": pawn_scores[::-1],

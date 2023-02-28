@@ -1,7 +1,7 @@
 import pygame as p
 import Chess_Rules_Engine
 import Drawing
-import Chess_AI_Engine, Chess_AI_Engine_multiprocessing_process, Chess_AI_Engine_multiprocessing_pool, Chess_AI_Engine_GPT
+import Chess_AI_Engine
 from multiprocessing import Queue, Process
 import time
 
@@ -28,16 +28,20 @@ def main():
     player_clicks = []
 
     black_AI = True
-    white_AI = True
+    white_AI = False
     AI_thinking = False
     Drawing.draw_all(screen, cre_gs, valid_moves, player_clicks)
-    
+
     while running:
         AI_turn = (cre_gs.white_to_move and white_AI) or (not cre_gs.white_to_move and black_AI)
 
         for event in p.event.get():
             if event.type == p.QUIT:
-                running = False
+                try:
+                    AI_thinking_process.terminate()
+                    running = False
+                except UnboundLocalError:
+                    running = False
 
             elif event.type == p.MOUSEBUTTONDOWN and not AI_thinking:  # take position from mouse click
                 location = p.mouse.get_pos()
@@ -91,7 +95,6 @@ def main():
                         AI_turn = False
                     cre_gs.undo_move()
                     move_made = True
-
 
                 if event.key == p.K_r:  # board reset
                     if AI_thinking:
@@ -152,7 +155,6 @@ def main():
                 move_made = True
                 animation = True
                 AI_thinking = False
-                print(f'{round((time.time() - start_time), 2)} sec - AI thinking time')
 
         Drawing.draw_all(screen, cre_gs, valid_moves, player_clicks)
 
