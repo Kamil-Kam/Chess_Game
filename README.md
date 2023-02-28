@@ -19,7 +19,7 @@ In current version; Player (white) vs Computer (black)
 
 To play you need to install Python 3 and Pygame. Run file Chess_Main.py
 Use mouse to move your pieces.
-r - reset noard
+r - reset board
 Backspace - undo move
 p - pause
 c - continue
@@ -46,23 +46,23 @@ different branches of the game tree concurrently.
 
 - add main menu
 
-- enable to choose by user, in which figure a pawn is promoted. Now it's always the queen.
+- pawn promotion to any piece. Now it's always the queen.
 
 - add the threefold repetition rule
 
 
 #### DONE:
-- Move ordering. Some moves are likely to be better than others. Currently, the code considers move in the order: from the most promising.
+- move ordering. Some moves are likely to be better than others. Currently, the code considers move in the order: from the most promising.
 As a result the search algorithm can potentially find the best move faster.
 
-- Game responsiveness. The responsiveness is provided by using two processes during the game. One of them runs the main game functions, 
+- game responsiveness. The responsiveness is provided by using two processes during the game. One of them runs the main game functions, 
 the other is responsible for the AI engine.
 
-- Chess rules. All essential chess rules, and special moves are implemented.
+- chess rules. All essential chess rules, and special moves are implemented.
 
-- Log panel with chess notation.
+- log panel with chess notation.
 
-- Pause and endgame statements.
+- pause and endgame statements.
 
 - AI calculations multiprocessing. AI engine calculations were run by 2 or 4 processes, but it didn't make calculations much faster, 
 in same cases even slower so it isn't currently implemented to the code and is waiting for further development.
