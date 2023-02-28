@@ -9,6 +9,9 @@ There is still a lot to do, especially to improve and optimize the AI engine.
 
 It`s my first project in Python. I used a lot of knowledge from youtube tutorials and stock overflow during writing this game.
 
+
+
+
 DONE:
 Move ordering.
 Some moves are likely to be better than others. Currently, the code considers move in the order: from the most promising.
@@ -24,11 +27,9 @@ Log panel with chess notation.
 
 Pause and endgame statements.
 
-Multiprocessing
-AI engine calculations were run by 2 or 4 processes, but it didn`t make calculation much faster, in same cases even slower 
-so its isn`t finally added to code, it`s waiting for farter development.
-
-
+AI calculations multiprocessing
+AI engine calculations were run by 2 or 4 processes, but it didn`t make calculations much faster, in same cases even slower 
+so it isn`t finally added to code and is waiting for further development.
 
 
 TODO:
