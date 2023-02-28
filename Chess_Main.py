@@ -1,9 +1,7 @@
 import pygame as p
-import Chess_Rules_Engine
-import Drawing
-import Chess_AI_Engine
+import Chess_Rules_Engine, Drawing, Chess_AI_Engine, time
 from multiprocessing import Queue, Process
-import time
+
 
 p.init()
 p.display.set_caption("Chess Project v. 1.0")
