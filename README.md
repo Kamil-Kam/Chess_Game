@@ -1,3 +1,4 @@
+####PREVIEW:
 ![Zrzut ekranu_20230228_212157](https://user-images.githubusercontent.com/116226497/221972131-69fa768b-7090-446f-a583-f319c6eecc5e.png)
 
 This project is a simple chess game player vs computer with a graphic interface. I created all the rules and engine myself; there are no imported versions.
@@ -12,8 +13,7 @@ There is still a lot to do, especially to improve and optimize the AI engine.
 
 It's my first project in Python. I used a lot of knowledge from youtube tutorials and stock overflow during writing this game.
 
-USAGE: 
-
+#### USAGE:
 The game was created and tested on Python 3.9.13 with Pygame 2.1.3 on Windows 11.
 In current version; Player (white) vs Computer (black)
 
@@ -25,7 +25,7 @@ p - pause
 c - continue
 
 
-TODO:
+####TODO:
 - improve get_valid_moves function to check only these moves which are possible invalid, now it's iterating through all the moves
 
 - use transposition tables: When the same position is encountered multiple times during the search, the program
@@ -51,7 +51,7 @@ different branches of the game tree concurrently.
 - add the threefold repetition rule
 
 
-DONE:
+####DONE:
 - Move ordering. Some moves are likely to be better than others. Currently, the code considers move in the order: from the most promising.
 As a result the search algorithm can potentially find the best move faster.
 
