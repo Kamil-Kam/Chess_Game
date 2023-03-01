@@ -18,7 +18,7 @@ It's my first project in Python. I used a lot of knowledge from youtube tutorial
 The game was created and tested on Python 3.9.13 with Pygame 2.1.3 on Windows 11.
 In current version; Player (white) vs Computer (black)
 
-To play you need to install Python 3 and Pygame. Run file Chess_Main.py
+To play you need to install Python 3 and Pygame. Run the file Chess_Main.py
 <br />Use mouse to move your pieces.
 <br />r - reset board
 <br />Backspace - undo move
