@@ -9,20 +9,21 @@ positions points) The graphical representation of the board is rendered  with a 
 
 The program only allows you to make valid moves according to the rules of chess, and also includes the special moves like castling, en_passant and pawn promotion.
 It includes almost all of the chess rules, except the threefold repetition rule. 
-There is still a lot to do, especially to improve and optimize the AI engine.
+<br />There is still a lot to do, especially to improve and optimize the AI engine.
 
 It's my first project in Python. I used a lot of knowledge from youtube tutorials and stock overflow during writing this game.
+
 
 #### USAGE:
 The game was created and tested on Python 3.9.13 with Pygame 2.1.3 on Windows 11.
 In current version; Player (white) vs Computer (black)
 
 To play you need to install Python 3 and Pygame. Run file Chess_Main.py
-Use mouse to move your pieces.
-r - reset board
-Backspace - undo move
-p - pause
-c - continue
+<br />Use mouse to move your pieces.
+<br />r - reset board
+<br />Backspace - undo move
+<br />p - pause
+<br />c - continue
 
 
 #### TODO:
